@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.nebula"
+version="1.0.0"
+name="Nebula"
+provider-name="matejdro">
+<requires>
+    <import addon="xbmc.python" version="2.26.0" />
+    <import addon="script.module.requests" version="2.12.4" />
+</requires>
+<extension point="xbmc.python.pluginsource" library="main.py">
+  <provides>video</provides>
+</extension>
+<extension point="xbmc.addon.metadata">
+  <summary lang="en">Matejdro Inoreader Plugin</summary>
+  <source>https://github.com/matejdro/kodi-nebula</source>
+  <assets>
+    <icon>resources/icon.png</icon>
+  </assets>
+</extension>
+</addon>
