@@ -3,6 +3,8 @@ import requests
 import xbmc
 import re
 import json
+import datetime
+import time
 
 class InvalidCredentials(Exception):
     pass
@@ -21,17 +23,27 @@ def login():
 
     storage.set_nebula_token(result_json["key"])
 
-def fetch_channel_list():
+def _refresh_channel_list():
     html_result = requests.get("https://watchnebula.com").text
 
     initial_state = re.search('<script id="initial-app-state" type="application/json">((.|\n)*?)</script>', html_result).group(1)
-    return json.loads(initial_state)
+    storage.save_cached_channels(json.loads(initial_state))
 
-def get_channel_list():
-    return fetch_channel_list()
+def _get_channel_list():
+    # Channel list rarely changes
+    # To speed up user's experience, cache channel list
+    # for 12 hours
+    
+    last_cache_time = storage.get_last_cache_date()
+    now = int(time.mktime(datetime.datetime.now().timetuple()))
+
+    if now - last_cache_time > 3600 * 12:
+        _refresh_channel_list()
+
+    return storage.get_cached_channels()
 
 def get_categories():
-    categories = [(k,v) for k,v in get_channel_list()["categories"]["byTitle"].items() if k[0] != "_"]
+    categories = [(k,v) for k,v in _get_channel_list()["categories"]["byTitle"].items() if k[0] != "_"]
     categories.sort(key=lambda a: a[0])
 
     return categories
