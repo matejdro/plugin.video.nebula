@@ -33,7 +33,7 @@ def _get_channel_list():
     # Channel list rarely changes
     # To speed up user's experience, cache channel list
     # for 12 hours
-    
+
     last_cache_time = storage.get_last_cache_date()
     now = int(time.mktime(datetime.datetime.now().timetuple()))
 
@@ -47,4 +47,10 @@ def get_categories():
     categories.sort(key=lambda a: a[0])
 
     return categories
-    
+
+def get_channels_in_category(category_title):
+    channels = [v for k,v in _get_channel_list()["channels"]["byID"].items() if v["genre"] == category_title]
+    channels.sort(key=lambda a: a["title"])
+
+    return channels
+
