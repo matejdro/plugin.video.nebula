@@ -52,6 +52,13 @@ def display_global_category_list():
     xbmcplugin.setPluginCategory(_handle, "Categories")
     xbmcplugin.setContent(_handle, "videos")
 
+    all_list_item = xbmcgui.ListItem(label="All Channels")
+    all_list_item.setProperty("IsPlayable", "false")
+
+    url = get_url(action='all_channels')
+
+    xbmcplugin.addDirectoryItem(_handle, url, all_list_item, True)
+
     for category in categories:
         title = category[0]
 
@@ -64,10 +71,21 @@ def display_global_category_list():
 
     xbmcplugin.endOfDirectory(_handle)
 
+def display_all_channels():
+    channels = api.get_all_channels()
+
+    xbmcplugin.setPluginCategory(_handle, "Category")
+    xbmcplugin.setContent(_handle, "videos")
+
+    for channel in channels:
+        list_item = get_channel_list_item(channel)
+        url = get_url(action="channel", title=channel["_id"])
+
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+
+    xbmcplugin.endOfDirectory(_handle)
 
 def display_category(title):
-    xbmc.log(str(), xbmc.LOGNOTICE)
-
     channels = api.get_channels_in_category(title)
 
     xbmcplugin.setPluginCategory(_handle, "Category")
@@ -90,6 +108,8 @@ def router(params):
 
     if action == "category":
         display_category(params["title"])
+    elif action == "all_channels":
+        display_all_channels()
     else:
         display_global_category_list()
 

@@ -54,3 +54,9 @@ def get_channels_in_category(category_title):
 
     return channels
 
+def get_all_channels():
+    channels = [v for k,v in _get_channel_list()["channels"]["byID"].items()]
+    channels.sort(key=lambda a: a["title"])
+
+    return channels
+
