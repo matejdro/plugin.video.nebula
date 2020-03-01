@@ -6,6 +6,11 @@ import json
 import datetime
 import time
 
+USER_AGENT = "Unofficial Kodi extension for Nebula - https://github.com/matejdro/kodi-nebula"
+HEADERS_WITH_ONLY_USER_AGENT = {
+    "User-Agent": USER_AGENT
+}
+
 class InvalidCredentials(Exception):
     pass
 
@@ -15,7 +20,12 @@ def login():
         "password": storage.get_saved_password()
     }
 
-    user_data = requests.post("https://api.watchnebula.com/api/v1/auth/login/", json=body)
+    user_data = requests.post(
+        "https://api.watchnebula.com/api/v1/auth/login/", 
+        json=body, 
+        headers=HEADERS_WITH_ONLY_USER_AGENT
+    )
+    
     if user_data.status_code != 200:
         raise InvalidCredentials()
 
