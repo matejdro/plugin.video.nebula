@@ -43,7 +43,7 @@ def _get_channel_list():
     return storage.get_cached_channels()
 
 def get_categories():
-    categories = [(k,v) for k,v in _get_channel_list()["categories"]["byTitle"].items() if k[0] != "_"]
+    categories = [(k,v) for k,v in _get_channel_list()["categories"]["byTitle"].items() if (k[0] != "_" and k != "YouTube Channel")]
     categories.sort(key=lambda a: a[0])
 
     return categories
