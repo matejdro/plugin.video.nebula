@@ -26,8 +26,7 @@ def get_url(**kwargs):
     return '{0}?{1}'.format(_url, urlencode(kwargs))
 
 
-def get_channel_list_item(channel):
-    xbmc.log(str(channel), xbmc.LOGNOTICE)
+def create_channel_list_item(channel):
     list_item = xbmcgui.ListItem(label=channel["title"])
     list_item.setProperty("IsPlayable", "false")
 
@@ -41,6 +40,27 @@ def get_channel_list_item(channel):
         "tagline": channel["bio"],
         "plotoutline": channel["bio"],
         "title": channel["title"]
+    })
+
+    return list_item
+
+def create_video_list_item(video):
+    list_item = xbmcgui.ListItem(label=video["title"])
+    list_item.setProperty("IsPlayable", "true")
+
+    image = video["thumbnails"][0]["url"]
+
+    list_item.setArt({
+        "thumb": image,
+        "icon": image
+    })
+
+    list_item.setInfo("video", {
+        "duration": video["duration"],
+        "tagline": video["description"],
+        "plotoutline": video["description"],
+        "title": video["title"],
+        "mediatype": "video"
     })
 
     return list_item
@@ -78,8 +98,8 @@ def display_all_channels():
     xbmcplugin.setContent(_handle, "videos")
 
     for channel in channels:
-        list_item = get_channel_list_item(channel)
-        url = get_url(action="channel", title=channel["_id"])
+        list_item = create_channel_list_item(channel)
+        url = get_url(action="channel", id=channel["_id"])
 
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
@@ -92,13 +112,40 @@ def display_category(title):
     xbmcplugin.setContent(_handle, "videos")
 
     for channel in channels:
-        list_item = get_channel_list_item(channel)
-        url = get_url(action="channel", title=channel["_id"])
+        list_item = create_channel_list_item(channel)
+        url = get_url(action="channel", id=channel["_id"])
 
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
     xbmcplugin.endOfDirectory(_handle)
 
+def display_channel_videos(channel_id, page):
+    videos = api.get_channel_videos(api.get_channel_by_id(channel_id), page)
+
+    xbmcplugin.setPluginCategory(_handle, "Category")
+    xbmcplugin.setContent(_handle, "videos")
+
+    if page > 1:
+        prev_page_list_item = xbmcgui.ListItem(label="<< Previous Page")
+        prev_page_list_item.setProperty("IsPlayable", "false")
+
+        url = get_url(action='channel', id = channel_id, page = page - 1)
+        xbmcplugin.addDirectoryItem(_handle, url, prev_page_list_item, True)
+
+    for video in videos:
+        list_item = create_video_list_item(video)
+        url = get_url(action="video", title=video["_id"])
+
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+
+    if len(videos) >= 20:
+        next_page_list_item = xbmcgui.ListItem(label="Next Page >>")
+        next_page_list_item.setProperty("IsPlayable", "false")
+
+        url = get_url(action='channel', id = channel_id, page = page + 1)
+        xbmcplugin.addDirectoryItem(_handle, url, next_page_list_item, True)
+
+    xbmcplugin.endOfDirectory(_handle)
 
 def router(params):
     if storage.get_nebula_token() is None:
@@ -108,6 +155,8 @@ def router(params):
 
     if action == "category":
         display_category(params["title"])
+    if action == "channel":
+        display_channel_videos(params["id"], int(params.get("page") or 1))
     elif action == "all_channels":
         display_all_channels()
     else:

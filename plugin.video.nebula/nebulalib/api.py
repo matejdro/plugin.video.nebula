@@ -11,8 +11,10 @@ HEADERS_WITH_ONLY_USER_AGENT = {
     "User-Agent": USER_AGENT
 }
 
+
 class InvalidCredentials(Exception):
     pass
+
 
 def login():
     body = {
@@ -21,11 +23,11 @@ def login():
     }
 
     user_data = requests.post(
-        "https://api.watchnebula.com/api/v1/auth/login/", 
-        json=body, 
+        "https://api.watchnebula.com/api/v1/auth/login/",
+        json=body,
         headers=HEADERS_WITH_ONLY_USER_AGENT
     )
-    
+
     if user_data.status_code != 200:
         raise InvalidCredentials()
 
@@ -33,11 +35,14 @@ def login():
 
     storage.set_nebula_token(result_json["key"])
 
+
 def _refresh_channel_list():
     html_result = requests.get("https://watchnebula.com").text
 
-    initial_state = re.search('<script id="initial-app-state" type="application/json">((.|\n)*?)</script>', html_result).group(1)
+    initial_state = re.search(
+        '<script id="initial-app-state" type="application/json">((.|\n)*?)</script>', html_result).group(1)
     storage.save_cached_channels(json.loads(initial_state))
+
 
 def _get_channel_list():
     # Channel list rarely changes
@@ -52,21 +57,42 @@ def _get_channel_list():
 
     return storage.get_cached_channels()
 
+
 def get_categories():
-    categories = [(k,v) for k,v in _get_channel_list()["categories"]["byTitle"].items() if (k[0] != "_" and k != "YouTube Channel")]
+    categories = [(k, v) for k, v in _get_channel_list()["categories"]
+                  ["byTitle"].items() if (k[0] != "_" and k != "YouTube Channel")]
     categories.sort(key=lambda a: a[0])
 
     return categories
 
+
 def get_channels_in_category(category_title):
-    channels = [v for k,v in _get_channel_list()["channels"]["byID"].items() if v["genre"] == category_title]
+    channels = [v for k, v in _get_channel_list()["channels"]
+                ["byID"].items() if v["genre"] == category_title]
     channels.sort(key=lambda a: a["title"])
 
     return channels
+
+
+def get_channel_by_id(id):
+    return _get_channel_list()["channels"]["byID"][id]
 
 def get_all_channels():
-    channels = [v for k,v in _get_channel_list()["channels"]["byID"].items()]
+    channels = [v for k, v in _get_channel_list()["channels"]["byID"].items()]
     channels.sort(key=lambda a: a["title"])
 
     return channels
 
+
+def get_channel_videos(channel, page):
+    return requests.get("https://api.zype.com/videos",
+                        headers=HEADERS_WITH_ONLY_USER_AGENT,
+                        params={
+                            "order": "desc",
+                            "page": page,
+                            "per_page": 20,
+                            "sort": "published_at",
+                            "playlist_id.inclusive": channel["playlist_id"],
+                            "api_key": "JlSv9XTImxelHi-eAHUVDy_NUM3uAtEogEpEdFoWHEOl9SKf5gl9pCHB1AYbY3QF"
+                        }
+                        ).json()["response"]
