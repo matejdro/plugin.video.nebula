@@ -11,7 +11,7 @@ provider-name="matejdro">
   <provides>video</provides>
 </extension>
 <extension point="xbmc.addon.metadata">
-  <summary lang="en">Matejdro Inoreader Plugin</summary>
+  <summary lang="en">Nebula</summary>
   <source>https://github.com/matejdro/kodi-nebula</source>
   <assets>
     <icon>resources/icon.png</icon>
