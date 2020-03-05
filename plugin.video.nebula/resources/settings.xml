@@ -5,6 +5,6 @@
         <setting label="Password" type="text" id="password" option="hidden" default=""/>
     </category>
     <category label="Video">
-        <setting id="resolution" label="Max resolution" type="enum" default="Unlimited" values="720p|1080p|2160p|Unlimited"/>
+        <setting id="resolution" label="Max resolution" type="enum" default="4" values="480p|720p|1080p|2160p|Unlimited"/>
     </category>
 </settings>

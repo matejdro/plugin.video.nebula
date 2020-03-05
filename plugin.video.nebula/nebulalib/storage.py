@@ -24,17 +24,21 @@ def get_saved_password():
 
 
 def get_setting_max_vertical_resolution():
-    resolutions = [720, 1080, 2160, 999999]
+    resolutions = [480, 720, 1080, 2160, 999999]
     return resolutions[_addon.getSettingInt("resolution")]
 
 
 def get_nebula_token():
-    return _addon.getSettingString("nebula_token")
-
+    return _addon.getSetting("nebula_token")
 
 def set_nebula_token(token):
     _addon.setSetting("nebula_token", token)
 
+def get_zype_token():
+    return _addon.getSetting("zype_token")
+
+def set_zype_token(token):
+    _addon.setSetting("zype_token", token)
 
 def get_last_cache_date():
     """

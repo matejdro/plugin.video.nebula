@@ -22,18 +22,32 @@ def login():
         "password": storage.get_saved_password()
     }
 
-    user_data = requests.post(
+    user_token_body = requests.post(
         "https://api.watchnebula.com/api/v1/auth/login/",
         json=body,
         headers=HEADERS_WITH_ONLY_USER_AGENT
     )
 
-    if user_data.status_code != 200:
+    if user_token_body.status_code != 200:
         raise InvalidCredentials()
 
-    result_json = user_data.json()
+    result_json = user_token_body.json()
 
     storage.set_nebula_token(result_json["key"])
+
+    user_data_headers = {
+        "User-Agent": USER_AGENT,
+        "Authorization": "Token " + storage.get_nebula_token()
+    }
+
+    user_data_body = requests.get(
+        "https://api.watchnebula.com/api/v1/auth/user/",
+        headers=user_data_headers
+    )
+    user_data_body.raise_for_status()
+
+    storage.set_zype_token(user_data_body.json()[
+                           "zype_auth_info"]["access_token"])
 
 
 def _refresh_channel_list():
@@ -58,6 +72,30 @@ def _get_channel_list():
     return storage.get_cached_channels()
 
 
+def get_video_manifest(video_id, relogin_on_fail=True):
+    response = requests.get("https://player.zype.com/manifest/" + video_id + ".m3u8",
+                            headers=HEADERS_WITH_ONLY_USER_AGENT,
+                            params={
+                                "access_token": storage.get_zype_token(),
+                                "ad_enabled": "false",
+                                "https": "true",
+                                "preview": "false"
+                            })
+
+    if response.status_code == 401:
+        login()
+        return _get_video_manifest(video_id, relogin_on_fail=False)
+
+    response.raise_for_status()
+
+    lines = response.text.splitlines()
+    playlist_entries = []
+    for i in range(1, len(lines) - 1):
+        playlist_entries.append((lines[i], lines[i + 1]))
+
+    return playlist_entries
+
+
 def get_categories():
     categories = [(k, v) for k, v in _get_channel_list()["categories"]
                   ["byTitle"].items() if (k[0] != "_" and k != "YouTube Channel")]
@@ -76,6 +114,7 @@ def get_channels_in_category(category_title):
 
 def get_channel_by_id(id):
     return _get_channel_list()["channels"]["byID"][id]
+
 
 def get_all_channels():
     channels = [v for k, v in _get_channel_list()["channels"]["byID"].items()]

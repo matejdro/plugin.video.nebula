@@ -7,7 +7,7 @@ import xbmcplugin
 import requests
 import xbmcaddon
 
-from nebulalib import api, storage
+from nebulalib import api, storage, videos
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
@@ -134,7 +134,7 @@ def display_channel_videos(channel_id, page):
 
     for video in videos:
         list_item = create_video_list_item(video)
-        url = get_url(action="video", title=video["_id"])
+        url = get_url(action="video", id=video["_id"])
 
         xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
 
@@ -147,10 +147,14 @@ def display_channel_videos(channel_id, page):
 
     xbmcplugin.endOfDirectory(_handle)
 
-def router(params):
-    if storage.get_nebula_token() is None:
-        api.login()
+def play_video(id):
+    url = videos.get_video_url(id)
+    play_item = xbmcgui.ListItem(path=url)
+    xbmcplugin.setResolvedUrl(_handle, True, play_item)
 
+def router(params):
+    if storage.get_nebula_token() == "" or storage.get_zype_token() == "":
+        api.login()
     action = params.get("action")
 
     if action == "category":
@@ -159,6 +163,8 @@ def router(params):
         display_channel_videos(params["id"], int(params.get("page") or 1))
     elif action == "all_channels":
         display_all_channels()
+    elif action == "video":
+        play_video(params["id"])
     else:
         display_global_category_list()
 
