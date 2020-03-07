@@ -16,5 +16,6 @@ provider-name="matejdro">
   <assets>
     <icon>resources/icon.png</icon>
   </assets>
+  <website>https://watchnebula.com</website>
 </extension>
 </addon>
