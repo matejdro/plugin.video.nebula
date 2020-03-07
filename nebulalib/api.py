@@ -6,7 +6,7 @@ import json
 import datetime
 import time
 
-USER_AGENT = "Unofficial Kodi extension for Nebula - https://github.com/matejdro/kodi-nebula"
+USER_AGENT = "Unofficial Kodi extension for Nebula - https://github.com/matejdro/plugin.video.nebula"
 HEADERS_WITH_ONLY_USER_AGENT = {
     "User-Agent": USER_AGENT
 }

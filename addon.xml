@@ -12,7 +12,7 @@ provider-name="matejdro">
 </extension>
 <extension point="xbmc.addon.metadata">
   <summary lang="en">Nebula</summary>
-  <source>https://github.com/matejdro/kodi-nebula</source>
+  <source>https://github.com/matejdro/plugin.video.nebula</source>
   <assets>
     <icon>resources/icon.png</icon>
   </assets>
