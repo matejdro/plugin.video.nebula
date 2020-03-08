@@ -1,5 +1,4 @@
 import sys
-from urllib import urlencode
 from urlparse import parse_qsl
 import xbmcgui
 import xbmc
@@ -7,63 +6,11 @@ import xbmcplugin
 import requests
 import xbmcaddon
 
-from nebulalib import api, storage, videos
+from nebulalib import api, storage, videos, lists
+from nebulalib.util import get_url
 
-# Get the plugin url in plugin:// notation.
-_url = sys.argv[0]
 # Get the plugin handle as an integer number.
 _handle = int(sys.argv[1])
-
-def get_url(**kwargs):
-    """
-    Create a URL for calling the plugin recursively from the given set of keyword arguments.
-
-    :param kwargs: "argument=value" pairs
-    :type kwargs: dict
-    :return: plugin call URL
-    :rtype: str
-    """
-    return '{0}?{1}'.format(_url, urlencode(kwargs))
-
-
-def create_channel_list_item(channel):
-    list_item = xbmcgui.ListItem(label=channel["title"])
-    list_item.setProperty("IsPlayable", "false")
-
-    list_item.setArt({
-        "thumb": channel["avatar"],
-        "icon": channel["avatar"],
-        "fanart": channel["banner"]
-    })
-
-    list_item.setInfo("video", {
-        "tagline": channel["bio"],
-        "plotoutline": channel["bio"],
-        "title": channel["title"]
-    })
-
-    return list_item
-
-def create_video_list_item(video):
-    list_item = xbmcgui.ListItem(label=video["title"])
-    list_item.setProperty("IsPlayable", "true")
-
-    image = video["thumbnails"][0]["url"]
-
-    list_item.setArt({
-        "thumb": image,
-        "icon": image
-    })
-
-    list_item.setInfo("video", {
-        "duration": video["duration"],
-        "tagline": video["description"],
-        "plotoutline": video["description"],
-        "title": video["title"],
-        "mediatype": "video"
-    })
-
-    return list_item
 
 
 def display_global_category_list():
@@ -82,15 +29,7 @@ def display_global_category_list():
     url = get_url(action='start_search')
     xbmcplugin.addDirectoryItem(_handle, url, search_list_item, True)
 
-    for category in categories:
-        title = category[0]
-
-        list_item = xbmcgui.ListItem(label=title)
-        list_item.setProperty("IsPlayable", "false")
-
-        url = get_url(action='category', title=title)
-
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    lists.show_category_list(_handle, categories)
 
     xbmcplugin.endOfDirectory(_handle)
 
@@ -100,11 +39,7 @@ def display_all_channels():
     xbmcplugin.setPluginCategory(_handle, "Category")
     xbmcplugin.setContent(_handle, "videos")
 
-    for channel in channels:
-        list_item = create_channel_list_item(channel)
-        url = get_url(action="channel", id=channel["_id"])
-
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    lists.show_channel_list(_handle, channels)
 
     xbmcplugin.endOfDirectory(_handle)
 
@@ -114,11 +49,7 @@ def display_category(title):
     xbmcplugin.setPluginCategory(_handle, "Category")
     xbmcplugin.setContent(_handle, "videos")
 
-    for channel in channels:
-        list_item = create_channel_list_item(channel)
-        url = get_url(action="channel", id=channel["_id"])
-
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    lists.show_channel_list(_handle, channels)
 
     xbmcplugin.endOfDirectory(_handle)
 
@@ -135,11 +66,7 @@ def display_channel_videos(channel_id, page):
         url = get_url(action='channel', id = channel_id, page = page - 1)
         xbmcplugin.addDirectoryItem(_handle, url, prev_page_list_item, True)
 
-    for video in videos:
-        list_item = create_video_list_item(video)
-        url = get_url(action="video", id=video["_id"])
-
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+    lists.show_video_list(_handle, videos)
 
     if len(videos) >= 20:
         next_page_list_item = xbmcgui.ListItem(label="Next Page >>")
@@ -172,11 +99,7 @@ def start_search():
         url = get_url(action='home')
         xbmcplugin.addDirectoryItem(_handle, url, no_results_list_item, True)
     else:
-        for video in videos:
-            list_item = create_video_list_item(video)
-            url = get_url(action="video", id=video["_id"])
-
-            xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+        lists.show_video_list(_handle, videos)
 
     xbmcplugin.endOfDirectory(_handle)
 
