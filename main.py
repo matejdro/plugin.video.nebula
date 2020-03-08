@@ -74,10 +74,13 @@ def display_global_category_list():
 
     all_list_item = xbmcgui.ListItem(label="All Channels")
     all_list_item.setProperty("IsPlayable", "false")
-
     url = get_url(action='all_channels')
-
     xbmcplugin.addDirectoryItem(_handle, url, all_list_item, True)
+
+    search_list_item = xbmcgui.ListItem(label="Search")
+    search_list_item.setProperty("IsPlayable", "false")
+    url = get_url(action='start_search')
+    xbmcplugin.addDirectoryItem(_handle, url, search_list_item, True)
 
     for category in categories:
         title = category[0]
@@ -152,6 +155,31 @@ def play_video(id):
     play_item = xbmcgui.ListItem(path=url)
     xbmcplugin.setResolvedUrl(_handle, True, play_item)
 
+def start_search():
+    keyword = xbmcgui.Dialog().input("Search")
+    if keyword == None or keyword == "":
+        return
+
+    videos = api.search(keyword)
+
+    xbmcplugin.setPluginCategory(_handle, "Category")
+    xbmcplugin.setContent(_handle, "videos")
+
+    if len(videos) == 0:
+        no_results_list_item = xbmcgui.ListItem(label="No Results")
+        no_results_list_item.setProperty("IsPlayable", "false")
+
+        url = get_url(action='home')
+        xbmcplugin.addDirectoryItem(_handle, url, no_results_list_item, True)
+    else:
+        for video in videos:
+            list_item = create_video_list_item(video)
+            url = get_url(action="video", id=video["_id"])
+
+            xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+
+    xbmcplugin.endOfDirectory(_handle)
+
 def router(params):
     if storage.get_nebula_token() == "" or storage.get_zype_token() == "":
         api.login()
@@ -165,6 +193,8 @@ def router(params):
         display_all_channels()
     elif action == "video":
         play_video(params["id"])
+    elif action == "start_search":
+        start_search()
     else:
         display_global_category_list()
 

@@ -135,3 +135,12 @@ def get_channel_videos(channel, page):
                             "api_key": "JlSv9XTImxelHi-eAHUVDy_NUM3uAtEogEpEdFoWHEOl9SKf5gl9pCHB1AYbY3QF"
                         }
                         ).json()["response"]
+
+def search(query):
+    return requests.get("https://api.zype.com/videos",
+                        headers=HEADERS_WITH_ONLY_USER_AGENT,
+                        params={
+                            "q": query,
+                            "api_key": "JlSv9XTImxelHi-eAHUVDy_NUM3uAtEogEpEdFoWHEOl9SKf5gl9pCHB1AYbY3QF"
+                        }
+                        ).json()["response"]
