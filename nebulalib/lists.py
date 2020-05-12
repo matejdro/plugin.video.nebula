@@ -45,12 +45,10 @@ def create_video_list_item(video):
 
 def show_category_list(handle, categories):
     for category in categories:
-        title = category[0]
-
-        list_item = xbmcgui.ListItem(label=title)
+        list_item = xbmcgui.ListItem(label=category)
         list_item.setProperty("IsPlayable", "false")
 
-        url = get_url(action='category', title=title)
+        url = get_url(action='category', title=category)
 
         xbmcplugin.addDirectoryItem(handle, url, list_item, True)
 

@@ -6,9 +6,8 @@ import xbmc
 
 _addon = xbmcaddon.Addon()
 
-
 def _get_channel_cache_file_name():
-    return xbmc.translatePath(_addon.getAddonInfo("profile") + "channels.json")
+    return xbmc.translatePath(_addon.getAddonInfo("profile") + "channels_v2.json")
 
 
 def is_logged_in():
@@ -44,7 +43,7 @@ def get_last_cache_date():
     """
     Returns unix time of last channel cache date or -1 if no channel was cached yet
     """
-    setting = _addon.getSetting("last_cache_date")
+    setting = _addon.getSetting("last_cache_date_v2")
     if len(setting) == 0:
         return -1
 
@@ -59,4 +58,4 @@ def get_cached_channels():
 def save_cached_channels(channels):
     with open(_get_channel_cache_file_name(), "w") as f:
         json.dump(channels, f)
-    _addon.setSetting("last_cache_date", str(int(time.mktime(datetime.datetime.now().timetuple()))))
+    _addon.setSetting("last_cache_date_v2", str(int(time.mktime(datetime.datetime.now().timetuple()))))

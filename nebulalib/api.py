@@ -50,11 +50,16 @@ def login():
 
 
 def _refresh_channel_list():
-    html_result = requests.get("https://watchnebula.com").text
+    json_result = requests.get("https://api.zype.com/zobjects",
+                    headers=HEADERS_WITH_ONLY_USER_AGENT,
+                    params={
+                        "zobject_type": "channel",
+                        "per_page": 500,
+                        "api_key": "JlSv9XTImxelHi-eAHUVDy_NUM3uAtEogEpEdFoWHEOl9SKf5gl9pCHB1AYbY3QF"
+                    }
+                    ).json()["response"]
 
-    initial_state = re.search(
-        '<script id="initial-app-state" type="application/json">((.|\n)*?)</script>', html_result).group(1)
-    storage.save_cached_channels(json.loads(initial_state))
+    storage.save_cached_channels(json_result)
 
 
 def _get_channel_list():
@@ -83,7 +88,7 @@ def get_video_manifest(video_id, relogin_on_fail=True):
 
     if response.status_code == 401:
         login()
-        return _get_video_manifest(video_id, relogin_on_fail=False)
+        return get_video_manifest(video_id, relogin_on_fail=False)
 
     response.raise_for_status()
 
@@ -96,27 +101,26 @@ def get_video_manifest(video_id, relogin_on_fail=True):
 
 
 def get_categories():
-    categories = [(k, v) for k, v in _get_channel_list()["categories"]
-                  ["byTitle"].items() if (k[0] != "_" and k != "YouTube Channel")]
-    categories.sort(key=lambda a: a[0])
+    categories = list(set([channel["genre"] for channel in _get_channel_list() if channel["genre"] is not None]))
+    categories.sort()
+
 
     return categories
 
 
 def get_channels_in_category(category_title):
-    channels = [v for k, v in _get_channel_list()["channels"]
-                ["byID"].items() if v["genre"] == category_title]
+    channels = [channel for channel in _get_channel_list() if channel["genre"] == category_title]
     channels.sort(key=lambda a: a["title"])
 
     return channels
 
 
 def get_channel_by_id(id):
-    return _get_channel_list()["channels"]["byID"][id]
+    return next(iter([channel for channel in _get_channel_list() if channel["_id"] == id]))
 
 
 def get_all_channels():
-    channels = [v for k, v in _get_channel_list()["channels"]["byID"].items()]
+    channels = _get_channel_list()
     channels.sort(key=lambda a: a["title"])
 
     return channels
