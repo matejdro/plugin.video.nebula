@@ -12,3 +12,12 @@ To use this plugin you MUST have a valid Nebula subscription.
 6. Enjoy
 
 Feel free to open any issues on the github with any problems or suggestions.
+
+# Development
+
+To set up development environment, you have to set up python virtual environment and install all requirements. While these are not required for the plugin's functionality, it enables autocomplete in IDE, easing development:
+
+```
+python -m venv venv
+pip install -r requirements.txt
+```
