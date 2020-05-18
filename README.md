@@ -1,4 +1,4 @@
-Work in progress Kodi plugin that allows playback of videos from [Nebula streaming service](https://watchnebula.com/).
+Kodi plugin that allows playback of videos from [Nebula streaming service](https://watchnebula.com/).
 
 To use this plugin you MUST have a valid Nebula subscription.
 
