@@ -41,13 +41,14 @@ def login():
     }
 
     user_data_body = requests.get(
-        "https://api.watchnebula.com/api/v1/zype/auth-info/",
+        "https://api.watchnebula.com/api/v1/auth/user/",
         headers=user_data_headers
     )
     user_data_body.raise_for_status()
 
-    storage.set_zype_token(user_data_body.json()["access_token"])
-
+    storage.set_zype_token(
+        user_data_body.json()["zype_auth_info"]["access_token"]
+    )
 
 def _refresh_channel_list():
     json_result = requests.get("https://api.zype.com/zobjects",
