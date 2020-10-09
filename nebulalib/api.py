@@ -40,14 +40,23 @@ def login():
         "Authorization": "Token " + storage.get_nebula_token()
     }
 
+    requests.post(
+        "https://api.watchnebula.com/api/v1/zype/auth-info/new/",
+        headers=user_data_headers,
+        json={}
+    ).raise_for_status()
+
     user_data_body = requests.get(
-        "https://api.watchnebula.com/api/v1/auth/user/",
+        "https://api.watchnebula.com/api/v1/zype/auth-info/",
         headers=user_data_headers
     )
     user_data_body.raise_for_status()
 
+    xbmc.log("ABCD", xbmc.LOGERROR)
+    xbmc.log("Text: " + user_data_body.text, xbmc.LOGERROR)
+
     storage.set_zype_token(
-        user_data_body.json()["zype_auth_info"]["access_token"]
+        user_data_body.json()["access_token"]
     )
 
 def _refresh_channel_list():
