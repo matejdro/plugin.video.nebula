@@ -24,6 +24,11 @@ def display_global_category_list():
     url = get_url(action='all_channels')
     xbmcplugin.addDirectoryItem(_handle, url, all_list_item, True)
 
+    all_videos_item = xbmcgui.ListItem(label="All Videos")
+    all_videos_item.setProperty("IsPlayable", "false")
+    url = get_url(action='all_videos')
+    xbmcplugin.addDirectoryItem(_handle, url, all_videos_item, True)
+
     search_list_item = xbmcgui.ListItem(label="Search")
     search_list_item.setProperty("IsPlayable", "false")
     url = get_url(action='start_search')
@@ -52,6 +57,31 @@ def display_category(title):
     lists.show_channel_list(_handle, channels)
 
     xbmcplugin.endOfDirectory(_handle)
+
+def display_all_videos(page):
+    videos = api.get_all_videos(page)
+
+    xbmcplugin.setPluginCategory(_handle, "Category")
+    xbmcplugin.setContent(_handle, "videos")
+
+    if page > 1:
+        prev_page_list_item = xbmcgui.ListItem(label="<< Previous Page")
+        prev_page_list_item.setProperty("IsPlayable", "false")
+
+        url = get_url(action='all_videos', page = page - 1)
+        xbmcplugin.addDirectoryItem(_handle, url, prev_page_list_item, True)
+
+    lists.show_video_list(_handle, videos)
+
+    if len(videos) >= 20:
+        next_page_list_item = xbmcgui.ListItem(label="Next Page >>")
+        next_page_list_item.setProperty("IsPlayable", "false")
+
+        url = get_url(action='all_videos', page = page + 1)
+        xbmcplugin.addDirectoryItem(_handle, url, next_page_list_item, True)
+
+    xbmcplugin.endOfDirectory(_handle)
+
 
 def display_channel_videos(channel_id, page):
     videos = api.get_channel_videos(api.get_channel_by_id(channel_id), page)
@@ -112,6 +142,8 @@ def router(params):
         display_category(params["title"])
     if action == "channel":
         display_channel_videos(params["id"], int(params.get("page") or 1))
+    elif action == "all_videos":
+        display_all_videos(int(params.get("page") or 1))
     elif action == "all_channels":
         display_all_channels()
     elif action == "video":

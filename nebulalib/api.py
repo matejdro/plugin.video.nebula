@@ -136,6 +136,18 @@ def get_all_channels():
     return channels
 
 
+def get_all_videos(page):
+    return requests.get("https://api.zype.com/videos",
+                        headers=HEADERS_WITH_ONLY_USER_AGENT,
+                        params={
+                            "order": "desc",
+                            "page": page,
+                            "per_page": 20,
+                            "sort": "published_at",
+                            "api_key": "JlSv9XTImxelHi-eAHUVDy_NUM3uAtEogEpEdFoWHEOl9SKf5gl9pCHB1AYbY3QF"
+                        }
+                        ).json()["response"]
+
 def get_channel_videos(channel, page):
     return requests.get("https://api.zype.com/videos",
                         headers=HEADERS_WITH_ONLY_USER_AGENT,
