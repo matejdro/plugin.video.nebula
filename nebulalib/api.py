@@ -96,7 +96,8 @@ def get_video_manifest(video_id, relogin_on_fail=True):
                                 "preview": "false"
                             })
 
-    if response.status_code == 401:
+    # API sometimes returns 404 if user is not logged in...
+    if response.status_code == 401 or response.status_code == 404:
         login()
         return get_video_manifest(video_id, relogin_on_fail=False)
 
