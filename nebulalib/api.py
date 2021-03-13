@@ -51,7 +51,7 @@ def login(retry_on_404=True):
         headers=user_data_headers
     )
 
-    if user_data_body.status_code == 404:
+    if retry_on_404 and user_data_body.status_code == 404:
         # Zype can sometimes return 404 here.
         # Retry logging in again if this happens
 
