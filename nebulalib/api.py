@@ -16,7 +16,7 @@ class InvalidCredentials(Exception):
     pass
 
 
-def login():
+def login(retry_on_404=True):
     body = {
         "email": storage.get_saved_username(),
         "password": storage.get_saved_password()
@@ -50,6 +50,15 @@ def login():
         "https://api.watchnebula.com/api/v1/zype/auth-info/",
         headers=user_data_headers
     )
+
+    if user_data_body.status_code == 404:
+        # Zype can sometimes return 404 here.
+        # Retry logging in again if this happens
+
+        login(False)
+        return
+
+
     user_data_body.raise_for_status()
 
     xbmc.log("ABCD", xbmc.LOGERROR)
