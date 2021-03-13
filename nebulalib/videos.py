@@ -1,5 +1,5 @@
-import api
-import storage
+from . import api
+from . import storage
 import xbmc
 
 def get_video_url(video_id):

@@ -1,4 +1,4 @@
-from urllib import urlencode
+import urllib 
 import sys
 
 def get_url(**kwargs):
@@ -10,4 +10,4 @@ def get_url(**kwargs):
     :return: plugin call URL
     :rtype: str
     """
-    return '{0}?{1}'.format(sys.argv[0], urlencode(kwargs))
+    return '{0}?{1}'.format(sys.argv[0], urllib.parse.urlencode(kwargs))

@@ -1,4 +1,4 @@
-import storage
+from . import storage
 import requests
 import xbmc
 import re

@@ -1,5 +1,5 @@
 import sys
-from urlparse import parse_qsl
+import urllib
 import xbmcgui
 import xbmc
 import xbmcplugin
@@ -156,7 +156,7 @@ def router(params):
 
 if __name__ == '__main__':
     try:
-        router(dict(parse_qsl(sys.argv[2][1:])))
+        router(dict(urllib.parse.parse_qsl(sys.argv[2][1:])))
     except api.InvalidCredentials as e:
         xbmcgui.Dialog().ok("Login Error",
                             "Failed to login to Nebula. Make sure you entered valid e-mail and password in Addon Settings")

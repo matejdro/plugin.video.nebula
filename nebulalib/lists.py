@@ -2,7 +2,7 @@ import xbmc
 import xbmcplugin
 import xbmcgui
 
-from util import get_url
+from .util import get_url
 
 def create_channel_list_item(channel):
     list_item = xbmcgui.ListItem(label=channel["title"])
