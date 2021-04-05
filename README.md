@@ -1,3 +1,5 @@
+# This addon is unmantained at the moment. I switched to [Matt's plugin](https://www.matthuisman.nz/2021/01/nebula-kodi-add-on.html) which is much more complete and feature-rich.
+
 Kodi plugin that allows playback of videos from [Nebula streaming service](https://watchnebula.com/).
 
 To use this plugin you MUST have a valid Nebula subscription. This extension is UNOFFICIAL and not affiliated with Nebula in any way.
